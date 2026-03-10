@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OLAM Kids — Gestion de Boutique</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--o:#f97316;--ol:#fdba74;--obg:#fff7ed;--t:#0d9488;--tbg:#ccfbf1;--r:#e11d48;--rbg:#fff1f2;--i:#4f46e5;--ibg:#eef2ff;--cr:#fefcf8;--ink:#292524;--m:#a8a29e;--bd:#f5f0eb;--c:#fff;--rd:16px;--sh:0 1px 4px rgba(41,37,36,.04);--fd:'Fredoka',sans-serif;--fb:'DM Sans',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--fb);background:var(--cr);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+.hdr{background:linear-gradient(135deg,#f97316,#fb923c 40%,#fdba74);padding:22px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-60px;right:-40px;width:260px;height:260px;background:radial-gradient(circle,rgba(255,255,255,.15),transparent 70%);border-radius:50%}
+.hdr *{position:relative;z-index:1}
+.hdr h1{font-family:var(--fd);font-size:26px;font-weight:700;color:#fff;letter-spacing:-.5px}
+.hdr p{font-size:13px;color:rgba(255,255,255,.85);margin-top:2px}
+.ha{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font-family:var(--fb);font-size:14px;font-weight:600;border:none;border-radius:11px;padding:10px 20px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:transform .12s}
+.btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(0)}
+.bp{background:var(--o);color:#fff;box-shadow:0 2px 8px rgba(249,115,22,.3)}
+.bg{background:rgba(255,255,255,.2);color:#fff;backdrop-filter:blur(8px)}.bg:hover{background:rgba(255,255,255,.32)}
+.bf{background:#f5f0eb;color:#78716c}.bf:hover{background:#ebe5de}
+.bs{padding:6px 12px;font-size:13px}
+.bt{background:var(--t);color:#fff}
+.br{background:var(--r);color:#fff;box-shadow:0 2px 8px rgba(225,29,72,.25)}
+.tabs{display:flex;gap:2px;padding:14px 32px 0;border-bottom:2px solid var(--bd);background:#fffdf9;overflow-x:auto}
+.tab{font-family:var(--fb);padding:10px 22px;border:none;background:transparent;border-radius:12px 12px 0 0;cursor:pointer;font-weight:600;font-size:14px;color:var(--m);position:relative;bottom:-2px;border-bottom:2px solid transparent;white-space:nowrap}
+.tab.active{color:var(--o);background:var(--cr);border-bottom-color:var(--o)}
+.cnt{padding:28px 32px;max-width:1300px}
+.sb{display:flex;align-items:center;gap:10px;margin-bottom:22px;padding:12px 18px;background:#fffdf9;border:1px solid var(--bd);border-radius:12px;font-size:13px;color:#78716c;flex-wrap:wrap}
+.dot{width:8px;height:8px;border-radius:50%}.dok{background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,.4)}.doe{background:#ef4444}.dol{background:#f59e0b;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.sts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
+.sc{background:var(--c);border-radius:var(--rd);padding:22px 24px;box-shadow:var(--sh);border:1px solid var(--bd);transition:box-shadow .2s,transform .2s}
+.sc:hover{box-shadow:0 4px 14px rgba(41,37,36,.07);transform:translateY(-2px)}
+.scr{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.sci{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.scl{font-size:13px;color:var(--m);font-weight:500}
+.scv{font-family:var(--fd);font-size:28px;font-weight:700;line-height:1.1}
+.scs{font-size:12px;color:var(--m);margin-top:4px}
+.al{border-radius:var(--rd);padding:16px 22px;margin-bottom:22px}
+.alw{background:var(--rbg);border:1px solid #fecdd3}.alw h4{color:var(--r)}
+.ali{background:var(--obg);border:1px solid #fed7aa}.ali h4{color:var(--o)}
+.al h4{font-size:14px;font-weight:700;margin-bottom:8px}
+.tg{display:flex;flex-wrap:wrap;gap:6px}
+.tgd{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;background:#fecdd3;color:#be123c}
+.tc{background:var(--c);border-radius:var(--rd);box-shadow:var(--sh);border:1px solid var(--bd);overflow:hidden}
+.tch{padding:18px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--bd);flex-wrap:wrap;gap:8px}
+.tch h3{font-family:var(--fd);font-size:18px;font-weight:700}
+.tsc{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;padding:12px 14px;color:var(--m);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.8px;background:#faf8f5;border-bottom:2px solid var(--bd)}
+td{padding:13px 14px;border-bottom:1px solid #faf5f0}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#fffcf7}
+.mono{font-family:monospace;color:var(--m);font-size:13px}
+.bold{font-weight:600}.grn{color:var(--t)}.red{color:var(--r)}.pur{color:var(--i)}
+.badge{display:inline-block;padding:3px 11px;border-radius:12px;font-size:12px;font-weight:600}
+.bcard{background:var(--ibg);color:var(--i)}.bcash{background:var(--tbg);color:var(--t)}.bmm{background:var(--obg);color:var(--o)}.bwa{background:#dcfce7;color:#16a34a}
+.bcat{background:#f5f0eb;color:#78716c;font-weight:500}
+.stk{padding:3px 11px;border-radius:12px;font-size:13px;font-weight:700}
+.stk0{background:#f5f0eb;color:var(--m)}.stkl{background:var(--rbg);color:var(--r)}.stkm{background:#fef9c3;color:#a16207}.stko{background:var(--tbg);color:var(--t)}
+.emp{padding:52px 16px;text-align:center;color:var(--m);font-size:15px}
+.tb{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.srch{position:relative;flex:1;min-width:240px}
+.srch svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--m)}
+.srch input{padding-left:40px}
+input,select{font-family:var(--fb);width:100%;padding:10px 14px;border-radius:11px;border:1.5px solid #e7e0d8;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;background:#fff}
+input:focus,select:focus{border-color:var(--ol);box-shadow:0 0 0 3px rgba(249,115,22,.1)}
+select{cursor:pointer;width:auto;min-width:150px}
+label{display:block;margin-bottom:5px;font-size:13px;font-weight:600;color:#57534e}
+.mo{position:fixed;inset:0;background:rgba(41,37,36,.4);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.mo.open{display:flex}
+.mob{background:#fff;border-radius:20px;padding:30px;max-width:520px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 25px 60px -12px rgba(41,37,36,.25);animation:su .25s ease-out}
+@keyframes su{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.moh{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.moh h2{font-family:var(--fd);font-size:22px;font-weight:700}
+.mox{background:#f5f0eb;border:none;border-radius:10px;cursor:pointer;padding:7px;display:flex;color:#78716c}
+.fg{display:flex;flex-direction:column;gap:14px}
+.fr{display:flex;gap:12px}.fr>div{flex:1}
+.fa{display:flex;gap:10px;justify-content:flex-end;margin-top:10px}
+.stot{background:#faf8f5;border-radius:12px;padding:14px 18px;border:1px solid #e7e0d8;font-size:14px}
+.stot span{color:var(--t);font-family:var(--fd);font-weight:700;font-size:22px}
+.prev{background:var(--ibg);border-radius:12px;padding:14px 18px;border:1px solid #c7d2fe;font-size:13px}
+.info{background:#faf8f5;border-radius:12px;padding:14px 18px;border:1px solid #e7e0d8}
+.ecat{display:inline-block;padding:3px 11px;border-radius:12px;font-size:12px;font-weight:600}
+.ld{position:fixed;inset:0;background:var(--cr);display:flex;align-items:center;justify-content:center;z-index:2000;flex-direction:column;gap:16px}
+.sp{width:48px;height:48px;border:4px solid var(--bd);border-top-color:var(--o);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ld p{font-family:var(--fd);font-size:20px;color:var(--o)}
+.ld small{color:var(--m);font-size:13px}
+@media(max-width:700px){.hdr{padding:16px 20px}.hdr h1{font-size:22px}.tabs{padding:12px 16px 0}.cnt{padding:20px}.scv{font-size:22px}}
+</style>
+</head>
+<body>
+<!-- Login Screen -->
+<div id="login-screen" style="position:fixed;inset:0;background:linear-gradient(135deg,#f97316,#fb923c 40%,#fdba74);display:flex;align-items:center;justify-content:center;z-index:3000">
+<div style="background:#fff;border-radius:24px;padding:40px;max-width:400px;width:90%;box-shadow:0 25px 60px rgba(0,0,0,.15);text-align:center">
+  <div style="font-size:48px;margin-bottom:8px">👶</div>
+  <h1 style="font-family:var(--fd);font-size:28px;color:var(--o);margin-bottom:4px">OLAM Kids</h1>
+  <p style="color:var(--m);font-size:14px;margin-bottom:28px">Connectez-vous pour continuer</p>
+  <div id="login-error" style="display:none;background:var(--rbg);color:var(--r);padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;margin-bottom:14px"></div>
+  <div style="display:flex;flex-direction:column;gap:14px;text-align:left">
+    <div><label>Nom d'utilisateur</label><input id="login-user" placeholder="admin ou caissier" autocomplete="username"></div>
+    <div><label>Mot de passe</label><input id="login-pass" type="password" placeholder="Mot de passe" autocomplete="current-password"></div>
+    <button class="btn bp" style="width:100%;justify-content:center;padding:14px;font-size:16px;margin-top:6px" onclick="doLogin()">Se connecter</button>
+  </div>
+</div>
+</div>
+
+<div id="ld" class="ld" style="display:none"><div class="sp"></div><p>OLAM Kids</p><small>Connexion aux données...</small></div>
+<div id="app" style="display:none">
+<div class="hdr">
+  <div><h1>👶 OLAM Kids</h1><p>Bébé sapé, parents heureux !</p></div>
+  <div class="ha">
+    <span id="hdr-user" style="background:rgba(255,255,255,.2);color:#fff;padding:8px 16px;border-radius:11px;font-size:13px;font-weight:600;backdrop-filter:blur(8px)"></span>
+    <button id="btn-add" class="btn bg" onclick="openModal('product')">＋ Ajouter</button>
+    <button class="btn bg" onclick="openModal('sale')">🛒 Vente</button>
+    <button id="btn-expense" class="btn bg" onclick="openModal('expense')">💸 Dépense</button>
+    <button class="btn bg" onclick="doLogout()" style="font-size:13px">Déconnexion</button>
+  </div>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="sw('dash',this)">Tableau de bord</button>
+  <button class="tab" onclick="sw('inv',this)">Inventaire</button>
+  <button class="tab" onclick="sw('sales',this)">Ventes</button>
+  <button class="tab admin-only" onclick="sw('exp',this)">Dépenses</button>
+  <button class="tab admin-only" onclick="sw('users',this)">Utilisateurs</button>
+</div>
+<div class="cnt">
+  <div class="sb">
+    <div id="dot" class="dot dol"></div><span id="sts">Connexion...</span><div style="flex:1"></div>
+    <button class="btn bf bs" onclick="syncAll()">🔄 Sync</button>
+    <button class="btn bf bs admin-only" onclick="xCSV('products')">📥 Produits</button>
+    <button class="btn bf bs admin-only" onclick="xCSV('sales')">📥 Ventes</button>
+    <button class="btn bf bs admin-only" onclick="xCSV('expenses')">📥 Dépenses</button>
+  </div>
+  <div id="t-dash"></div><div id="t-inv" style="display:none"></div><div id="t-sales" style="display:none"></div><div id="t-exp" style="display:none"></div><div id="t-users" style="display:none"></div>
+</div>
+</div>
+
+<!-- Product Modal -->
+<div id="m-product" class="mo" onclick="if(event.target===this)closeModal('product')"><div class="mob"><div class="moh"><h2 id="mp-t">Ajouter un produit</h2><button class="mox" onclick="closeModal('product')">✕</button></div>
+<div class="fg">
+  <div><label>Nom *</label><input id="pf-n" placeholder="ex: Robe d'été fleurie"></div>
+  <div><label>Référence *</label><input id="pf-s" placeholder="ex: REF-084"></div>
+  <div class="fr"><div><label>Catégorie</label><select id="pf-c"></select></div><div><label>Taille</label><select id="pf-z"></select></div></div>
+  <div class="fr"><div><label>Prix de vente (FCFA)</label><input id="pf-p" type="number" placeholder="0"></div><div><label>Stock</label><input id="pf-st" type="number" placeholder="0"></div></div>
+  <div class="fa"><button class="btn bf" onclick="closeModal('product')">Annuler</button><button class="btn bp" id="pf-sv" onclick="saveProd()">Ajouter</button></div>
+</div></div></div>
+
+<!-- Sale Modal -->
+<div id="m-sale" class="mo" onclick="if(event.target===this)closeModal('sale')"><div class="mob"><div class="moh"><h2>Enregistrer une vente</h2><button class="mox" onclick="closeModal('sale')">✕</button></div>
+<div class="fg">
+  <div><label>Produit *</label><select id="sf-p" onchange="onSPC()"><option value="">Sélectionner...</option></select></div>
+  <div class="fr"><div><label>Prix unitaire (FCFA) *</label><input id="sf-pr" type="number" placeholder="0" oninput="uST()"></div><div><label>Quantité</label><input id="sf-q" type="number" min="1" value="1" oninput="uST()"></div></div>
+  <div><label>Paiement</label><select id="sf-pay"><option>Carte</option><option>Espèces</option><option>Mobile Money</option><option>WhatsApp</option></select></div>
+  <div id="sf-tr" class="stot" style="display:none"><strong>Total: </strong><span id="sf-t">0 FCFA</span></div>
+  <div class="fa"><button class="btn bf" onclick="closeModal('sale')">Annuler</button><button class="btn bt" onclick="recSale()">Enregistrer</button></div>
+</div></div></div>
+
+<!-- Expense Modal -->
+<div id="m-expense" class="mo" onclick="if(event.target===this)closeModal('expense')"><div class="mob"><div class="moh"><h2 id="me-t">Ajouter une dépense</h2><button class="mox" onclick="closeModal('expense')">✕</button></div>
+<div class="fg">
+  <div><label>Description *</label><input id="ef-d" placeholder="ex: Loyer boutique mars 2026"></div>
+  <div class="fr"><div><label>Catégorie</label><select id="ef-c"></select></div><div><label>Montant (FCFA) *</label><input id="ef-a" type="number" placeholder="0"></div></div>
+  <div class="fr"><div><label>Date</label><input id="ef-dt" type="date"></div><div><label>Notes</label><input id="ef-n" placeholder="Optionnel"></div></div>
+  <div class="fa"><button class="btn bf" onclick="closeModal('expense')">Annuler</button><button class="btn br" id="ef-sv" onclick="saveExp()">Ajouter</button></div>
+</div></div></div>
+
+<!-- Restock Modal -->
+<div id="m-restock" class="mo" onclick="if(event.target===this)closeModal('restock')"><div class="mob"><div class="moh"><h2 id="mr-t">Réapprovisionner</h2><button class="mox" onclick="closeModal('restock')">✕</button></div>
+<div class="fg">
+  <div id="mr-info" class="info"></div>
+  <div class="fr"><div><label>Quantité reçue *</label><input id="rf-q" type="number" min="1" placeholder="0" oninput="uRP()"></div><div><label>Coût unitaire (FCFA) *</label><input id="rf-c" type="number" placeholder="Prix d'achat" oninput="uRP()"></div></div>
+  <div id="mr-prev" class="prev" style="display:none"></div>
+  <div class="fa"><button class="btn bf" onclick="closeModal('restock')">Annuler</button><button class="btn bt" onclick="doRestock()">Réapprovisionner</button></div>
+</div></div></div>
+
+<script>
+const CATALOGUE = [{"id": "r001", "name": "Robe Fendi grise", "category": "Vêtements", "size": "2-3A", "price": 0, "stock": 0, "sku": "REF-001", "costPrice": 0, "avgCost": 0}, {"id": "r002", "name": "Sac à main enfant", "category": "Sacs", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-002", "costPrice": 0, "avgCost": 0}, {"id": "r003", "name": "Bonnet de bébé", "category": "Accessoires", "size": "0-3M", "price": 0, "stock": 0, "sku": "REF-003", "costPrice": 0, "avgCost": 0}, {"id": "r004", "name": "Coussin de positionnement bébé", "category": "Literie", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-004", "costPrice": 0, "avgCost": 0}, {"id": "r005", "name": "Kit empreinte & souvenirs bébé", "category": "Accessoires", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-005", "costPrice": 0, "avgCost": 0}, {"id": "r006", "name": "Ensemble garçon short & t-shirt", "category": "Ensembles", "size": "12-18M", "price": 0, "stock": 0, "sku": "REF-006", "costPrice": 0, "avgCost": 0}, {"id": "r007", "name": "Ensemble garçon coloré avec chapeau", "category": "Ensembles", "size": "12-18M", "price": 0, "stock": 0, "sku": "REF-007", "costPrice": 0, "avgCost": 0}, {"id": "r008", "name": "Pyjama Minnie rose (lot)", "category": "Ensembles", "size": "6-12M", "price": 0, "stock": 0, "sku": "REF-008", "costPrice": 0, "avgCost": 0}, {"id": "r009", "name": "Salopette garçon avec nœud", "category": "Vêtements", "size": "12-18M", "price": 0, "stock": 0, "sku": "REF-009", "costPrice": 0, "avgCost": 0}, {"id": "r010", "name": "Ensemble Mickey t-shirt & short", "category": "Ensembles", "size": "12-18M", "price": 0, "stock": 0, "sku": "REF-010", "costPrice": 0, "avgCost": 0}, {"id": "r011", "name": "Lot bodies & pyjamas fille rose", "category": "Ensembles", "size": "6-12M", "price": 0, "stock": 0, "sku": "REF-011", "costPrice": 0, "avgCost": 0}, {"id": "r012", "name": "Lot bodies mixtes (12 pièces)", "category": "Ensembles", "size": "3-6M", "price": 0, "stock": 0, "sku": "REF-012", "costPrice": 0, "avgCost": 0}, {"id": "r013", "name": "Lot bodies & pantalons bébé", "category": "Ensembles", "size": "6-12M", "price": 0, "stock": 0, "sku": "REF-013", "costPrice": 0, "avgCost": 0}, {"id": "r014", "name": "Robe Love avec bandeau", "category": "Vêtements", "size": "6-12M", "price": 0, "stock": 0, "sku": "REF-014", "costPrice": 0, "avgCost": 0}, {"id": "r015", "name": "Robe fleurie avec nœud rose", "category": "Vêtements", "size": "6-12M", "price": 0, "stock": 0, "sku": "REF-015", "costPrice": 0, "avgCost": 0}, {"id": "r016", "name": "Ensemble Best Girl rose", "category": "Ensembles", "size": "12-18M", "price": 0, "stock": 0, "sku": "REF-016", "costPrice": 0, "avgCost": 0}, {"id": "r017", "name": "Robe fille imprimé floral bleu", "category": "Vêtements", "size": "6-12M", "price": 0, "stock": 0, "sku": "REF-017", "costPrice": 0, "avgCost": 0}, {"id": "r018", "name": "Robe fleurie bretelles bleu marine", "category": "Vêtements", "size": "12-18M", "price": 0, "stock": 0, "sku": "REF-018", "costPrice": 0, "avgCost": 0}, {"id": "r019", "name": "Ensemble garçon dinosaure", "category": "Ensembles", "size": "12-18M", "price": 0, "stock": 0, "sku": "REF-019", "costPrice": 0, "avgCost": 0}, {"id": "r020", "name": "Biberons bébé (lot de 3)", "category": "Biberons", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-020", "costPrice": 0, "avgCost": 0}, {"id": "r021", "name": "Ensemble fille papillons blanc/rose", "category": "Ensembles", "size": "12-18M", "price": 0, "stock": 0, "sku": "REF-021", "costPrice": 0, "avgCost": 0}, {"id": "r022", "name": "Robe ours avec peluche", "category": "Vêtements", "size": "6-12M", "price": 0, "stock": 0, "sku": "REF-022", "costPrice": 0, "avgCost": 0}, {"id": "r023", "name": "Ensemble salopette lapin rose", "category": "Ensembles", "size": "3-6M", "price": 0, "stock": 0, "sku": "REF-023", "costPrice": 0, "avgCost": 0}, {"id": "r024", "name": "Set sacs à langer éléphant", "category": "Sacs", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-024", "costPrice": 0, "avgCost": 0}, {"id": "r025", "name": "Siège bébé en peluche lapin rose", "category": "Mobilier", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-025", "costPrice": 0, "avgCost": 0}, {"id": "r026", "name": "Ensemble Minnie rouge à pois", "category": "Ensembles", "size": "12-18M", "price": 0, "stock": 0, "sku": "REF-026", "costPrice": 0, "avgCost": 0}, {"id": "r027", "name": "Siège bébé en peluche ours", "category": "Mobilier", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-027", "costPrice": 0, "avgCost": 0}, {"id": "r028", "name": "Pyjama nœuds bleu naissance", "category": "Vêtements", "size": "0-3M", "price": 0, "stock": 0, "sku": "REF-028", "costPrice": 0, "avgCost": 0}, {"id": "r029", "name": "Lot bonnets hiver garçon", "category": "Accessoires", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-029", "costPrice": 0, "avgCost": 0}, {"id": "r030", "name": "Chaussures bébé dorées avec nœud", "category": "Chaussures", "size": "0-3M", "price": 0, "stock": 0, "sku": "REF-030", "costPrice": 0, "avgCost": 0}, {"id": "r031", "name": "Robe papillon avec nœud beige", "category": "Vêtements", "size": "2-3A", "price": 0, "stock": 0, "sku": "REF-031", "costPrice": 0, "avgCost": 0}, {"id": "r032", "name": "Table et chaises enfant convertible", "category": "Mobilier", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-032", "costPrice": 0, "avgCost": 0}, {"id": "r033", "name": "Set bandeaux roses bébé fille", "category": "Accessoires", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-033", "costPrice": 0, "avgCost": 0}, {"id": "r034", "name": "Chaussures strass & bandeau bleu", "category": "Chaussures", "size": "0-3M", "price": 0, "stock": 0, "sku": "REF-034", "costPrice": 0, "avgCost": 0}, {"id": "r035", "name": "Chaussures nœud doré & bandeau", "category": "Chaussures", "size": "0-3M", "price": 0, "stock": 0, "sku": "REF-035", "costPrice": 0, "avgCost": 0}, {"id": "r036", "name": "Robe salopette rouge fuchsia", "category": "Vêtements", "size": "12-18M", "price": 0, "stock": 0, "sku": "REF-036", "costPrice": 0, "avgCost": 0}, {"id": "r037", "name": "Robe de fête violette à volants", "category": "Vêtements", "size": "2-3A", "price": 0, "stock": 0, "sku": "REF-037", "costPrice": 0, "avgCost": 0}, {"id": "r038", "name": "Robe béret rose avec fleurs", "category": "Vêtements", "size": "2-3A", "price": 0, "stock": 0, "sku": "REF-038", "costPrice": 0, "avgCost": 0}, {"id": "r039", "name": "Ensemble gilet fourrure & jupe", "category": "Ensembles", "size": "3-4A", "price": 0, "stock": 0, "sku": "REF-039", "costPrice": 0, "avgCost": 0}, {"id": "r040", "name": "Robe verte avec nœud & col blanc", "category": "Vêtements", "size": "2-3A", "price": 0, "stock": 0, "sku": "REF-040", "costPrice": 0, "avgCost": 0}, {"id": "r041", "name": "Ensemble fille fraises rouge", "category": "Ensembles", "size": "12-18M", "price": 0, "stock": 0, "sku": "REF-041", "costPrice": 0, "avgCost": 0}, {"id": "r042", "name": "Ensemble veste cuir & robe tulle", "category": "Ensembles", "size": "3-4A", "price": 0, "stock": 0, "sku": "REF-042", "costPrice": 0, "avgCost": 0}, {"id": "r043", "name": "Ensemble cardigan marron & jupe", "category": "Ensembles", "size": "3-4A", "price": 0, "stock": 0, "sku": "REF-043", "costPrice": 0, "avgCost": 0}, {"id": "r044", "name": "Set vaisselle silicone bébé rose", "category": "Hygiène", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-044", "costPrice": 0, "avgCost": 0}, {"id": "r045", "name": "Robe rouge de fête avec nœud", "category": "Vêtements", "size": "2-3A", "price": 0, "stock": 0, "sku": "REF-045", "costPrice": 0, "avgCost": 0}, {"id": "r046", "name": "Ensemble survêtement Rilakkuma jaune", "category": "Ensembles", "size": "2-3A", "price": 0, "stock": 0, "sku": "REF-046", "costPrice": 0, "avgCost": 0}, {"id": "r047", "name": "Robe fleurie avec nœuds roses", "category": "Vêtements", "size": "12-18M", "price": 0, "stock": 0, "sku": "REF-047", "costPrice": 0, "avgCost": 0}, {"id": "r048", "name": "Armoire rangement enfant", "category": "Mobilier", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-048", "costPrice": 0, "avgCost": 0}, {"id": "r049", "name": "Set vaisselle silicone bébé bleu", "category": "Hygiène", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-049", "costPrice": 0, "avgCost": 0}, {"id": "r050", "name": "Kit biberons & accessoires newborn", "category": "Biberons", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-050", "costPrice": 0, "avgCost": 0}, {"id": "r051", "name": "Table à langer & berceau pliable", "category": "Mobilier", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-051", "costPrice": 0, "avgCost": 0}, {"id": "r052", "name": "Lot pyjamas & bodies fille rose", "category": "Ensembles", "size": "3-6M", "price": 0, "stock": 0, "sku": "REF-052", "costPrice": 0, "avgCost": 0}, {"id": "r053", "name": "Berceau cododo bleu turquoise", "category": "Literie", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-053", "costPrice": 0, "avgCost": 0}, {"id": "r054", "name": "Berceau cododo rose", "category": "Literie", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-054", "costPrice": 0, "avgCost": 0}, {"id": "r055", "name": "Trousseau naissance blanc (8 pcs)", "category": "Ensembles", "size": "0-3M", "price": 0, "stock": 0, "sku": "REF-055", "costPrice": 0, "avgCost": 0}, {"id": "r056", "name": "Coffret biberons dBb (3 pcs)", "category": "Biberons", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-056", "costPrice": 0, "avgCost": 0}, {"id": "r057", "name": "Set bain bébé (baignoire, pot, etc.)", "category": "Hygiène", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-057", "costPrice": 0, "avgCost": 0}, {"id": "r058", "name": "Set bain bébé turquoise complet", "category": "Hygiène", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-058", "costPrice": 0, "avgCost": 0}, {"id": "r059", "name": "Berceau mobile musical rose", "category": "Literie", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-059", "costPrice": 0, "avgCost": 0}, {"id": "r060", "name": "Lot bodies & bavoirs bébé violet", "category": "Ensembles", "size": "3-6M", "price": 0, "stock": 0, "sku": "REF-060", "costPrice": 0, "avgCost": 0}, {"id": "r061", "name": "Lit bébé en bois blanc", "category": "Literie", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-061", "costPrice": 0, "avgCost": 0}, {"id": "r062", "name": "Tapis d'éveil musical coloré", "category": "Jouets", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-062", "costPrice": 0, "avgCost": 0}, {"id": "r063", "name": "Siège d'activité bébé bleu", "category": "Mobilier", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-063", "costPrice": 0, "avgCost": 0}, {"id": "r064", "name": "Set pot & bain bébé bleu", "category": "Hygiène", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-064", "costPrice": 0, "avgCost": 0}, {"id": "r065", "name": "Chaussettes hautes fille (lot)", "category": "Accessoires", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-065", "costPrice": 0, "avgCost": 0}, {"id": "r066", "name": "Ensemble fille Minnie beige", "category": "Ensembles", "size": "12-18M", "price": 0, "stock": 0, "sku": "REF-066", "costPrice": 0, "avgCost": 0}, {"id": "r067", "name": "Chaussettes bébé colorées (lot)", "category": "Accessoires", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-067", "costPrice": 0, "avgCost": 0}, {"id": "r068", "name": "Ensemble robe & bandeau fille rose", "category": "Ensembles", "size": "6-12M", "price": 0, "stock": 0, "sku": "REF-068", "costPrice": 0, "avgCost": 0}, {"id": "r069", "name": "Ensemble Mickey rayé garçon", "category": "Ensembles", "size": "12-18M", "price": 0, "stock": 0, "sku": "REF-069", "costPrice": 0, "avgCost": 0}, {"id": "r070", "name": "Ensemble Minnie rouge fille", "category": "Ensembles", "size": "2-3A", "price": 0, "stock": 0, "sku": "REF-070", "costPrice": 0, "avgCost": 0}, {"id": "r071", "name": "Transat balancelle bébé gris", "category": "Mobilier", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-071", "costPrice": 0, "avgCost": 0}, {"id": "r072", "name": "Biberons anti-colique (lot)", "category": "Biberons", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-072", "costPrice": 0, "avgCost": 0}, {"id": "r073", "name": "Couverture emmaillotage rose", "category": "Literie", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-073", "costPrice": 0, "avgCost": 0}, {"id": "r074", "name": "Pantalon bébé fille rose fleuri", "category": "Vêtements", "size": "6-12M", "price": 0, "stock": 0, "sku": "REF-074", "costPrice": 0, "avgCost": 0}, {"id": "r075", "name": "Ensemble hoodie ours bébé rose", "category": "Ensembles", "size": "6-12M", "price": 0, "stock": 0, "sku": "REF-075", "costPrice": 0, "avgCost": 0}, {"id": "r076", "name": "Boîte doseuse lait en poudre", "category": "Biberons", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-076", "costPrice": 0, "avgCost": 0}, {"id": "r077", "name": "Kit soin bébé (brosse, ciseaux...)", "category": "Hygiène", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-077", "costPrice": 0, "avgCost": 0}, {"id": "r078", "name": "Set bonnets & moufles lapin rose", "category": "Accessoires", "size": "0-3M", "price": 0, "stock": 0, "sku": "REF-078", "costPrice": 0, "avgCost": 0}, {"id": "r079", "name": "Ensemble jogging ours bébé rose", "category": "Ensembles", "size": "6-12M", "price": 0, "stock": 0, "sku": "REF-079", "costPrice": 0, "avgCost": 0}, {"id": "r080", "name": "Lot bodies fille imprimés (5 pcs)", "category": "Ensembles", "size": "3-6M", "price": 0, "stock": 0, "sku": "REF-080", "costPrice": 0, "avgCost": 0}, {"id": "r081", "name": "Bodies rayés mixtes (lot)", "category": "Ensembles", "size": "3-6M", "price": 0, "stock": 0, "sku": "REF-081", "costPrice": 0, "avgCost": 0}, {"id": "r082", "name": "Robe de cérémonie fleurie rose", "category": "Vêtements", "size": "2-3A", "price": 0, "stock": 0, "sku": "REF-082", "costPrice": 0, "avgCost": 0}, {"id": "r083", "name": "Couvertures bébé imprimées (lot)", "category": "Literie", "size": "Unique", "price": 0, "stock": 0, "sku": "REF-083", "costPrice": 0, "avgCost": 0}];
+const API_URL = window.location.hostname === 'localhost' || window.location.protocol === 'file:'
+  ? 'http://localhost:3000'
+  : window.location.origin;
+const CATS = ["Vêtements","Ensembles","Chaussures","Accessoires","Sacs","Biberons","Literie","Mobilier","Hygiène","Jouets"];
+const SIZES = ["0-3M","3-6M","6-12M","12-18M","18-24M","2-3A","3-4A","4-5A","Unique"];
+const ECATS = ["Loyer","Salaires","Électricité","Eau","Internet","Transport","Fournitures","Marketing","Taxes","Autre"];
+const gid=()=>'o_'+Math.random().toString(36).substr(2,9);
+const td=()=>new Date().toISOString().split('T')[0];
+const fd=d=>{if(!d||d.length<10)return d;const[y,m,dd]=d.split('-');return`${dd}-${m}-${y}`;};
+const fn=n=>Number(n).toLocaleString('fr-FR');
+const pb=p=>p==='Carte'?'bcard':p==='Espèces'?'bcash':p==='Mobile Money'?'bmm':'bwa';
+const ecc=c=>c==='Loyer'?'background:var(--obg);color:var(--o)':c==='Salaires'?'background:var(--ibg);color:var(--i)':'background:#f5f0eb;color:#78716c';
+
+let P=[],S=[],E=[],U=[],editPid=null,editEid=null,restockP=null,search='',fCat='Tous',online=false;
+let authToken=localStorage.getItem('olam_token'),userRole=localStorage.getItem('olam_role'),userName=localStorage.getItem('olam_user');
+const isAdmin=()=>userRole==='admin';
+
+function authHeaders(){return authToken?{'x-auth-token':authToken}:{};}
+
+async function apiGet(path){
+  const r=await fetch(API_URL+path,{headers:authHeaders()});
+  if(r.status===401){doLogout();throw new Error('Session expirée');}
+  if(!r.ok)throw new Error('API error '+r.status);
+  return r.json();
+}
+async function apiPost(path,data){
+  const r=await fetch(API_URL+path,{method:'POST',headers:{'Content-Type':'application/json',...authHeaders()},body:JSON.stringify(data)});
+  if(r.status===401){doLogout();throw new Error('Session expirée');}
+  if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.error||'API error '+r.status);}
+  return r.json();
+}
+async function apiPut(path,data){
+  const r=await fetch(API_URL+path,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders()},body:JSON.stringify(data)});
+  if(r.status===401){doLogout();throw new Error('Session expirée');}
+  if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.error||'API error '+r.status);}
+  return r.json();
+}
+async function apiDel(path){
+  const r=await fetch(API_URL+path,{method:'DELETE',headers:authHeaders()});
+  if(r.status===401){doLogout();throw new Error('Session expirée');}
+  if(!r.ok&&r.status!==204)throw new Error('API error '+r.status);
+  return true;
+}
+
+async function doLogin(){
+  const u=document.getElementById('login-user').value.trim(),p=document.getElementById('login-pass').value;
+  const errEl=document.getElementById('login-error');
+  if(!u||!p){errEl.textContent='Veuillez remplir tous les champs';errEl.style.display='';return;}
+  try{
+    const r=await fetch(API_URL+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const d=await r.json();
+    if(!r.ok){errEl.textContent=d.error||'Erreur de connexion';errEl.style.display='';return;}
+    authToken=d.token;userRole=d.role;userName=d.username;
+    localStorage.setItem('olam_token',authToken);localStorage.setItem('olam_role',userRole);localStorage.setItem('olam_user',userName);
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('ld').style.display='flex';
+    applyRole();
+    init();
+  }catch(e){errEl.textContent='Impossible de se connecter au serveur';errEl.style.display='';}
+}
+
+function doLogout(){
+  if(authToken)fetch(API_URL+'/api/logout',{method:'POST',headers:authHeaders()}).catch(()=>{});
+  authToken=null;userRole=null;userName=null;
+  localStorage.removeItem('olam_token');localStorage.removeItem('olam_role');localStorage.removeItem('olam_user');
+  if(refreshInterval)clearInterval(refreshInterval);
+  document.getElementById('app').style.display='none';
+  document.getElementById('ld').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('login-pass').value='';
+  document.getElementById('login-error').style.display='none';
+}
+
+function applyRole(){
+  document.getElementById('hdr-user').textContent=(isAdmin()?'Admin':'Caissier')+' — '+userName;
+  document.getElementById('btn-add').style.display=isAdmin()?'':'none';
+  document.getElementById('btn-expense').style.display=isAdmin()?'':'none';
+  // Hide all admin-only elements (expenses tab, users tab, export buttons, etc.)
+  document.querySelectorAll('.admin-only').forEach(el=>el.style.display=isAdmin()?'':'none');
+}
+
+function ss(t,m){document.getElementById('dot').className='dot '+(t==='o'?'dok':t==='l'?'dol':'doe');document.getElementById('sts').textContent=m;}
+
+async function syncAll(){
+  ss('l','Synchronisation...');
+  try{
+    const promises=[apiGet('/api/products'),apiGet('/api/sales')];
+    if(isAdmin()){promises.push(apiGet('/api/expenses'));promises.push(apiGet('/api/users'));}
+    const results=await Promise.all(promises);
+    P=results[0];S=results[1];E=isAdmin()?results[2]:[];U=isAdmin()?results[3]:[];online=true;
+    ss('o','Connecté — '+new Date().toLocaleTimeString());
+  }catch(err){
+    console.error('[Sync]',err);
+    ss('e','Erreur de connexion');
+    online=false;
+  }
+  render();
+}
+
+let refreshInterval=null;
+function startAutoRefresh(){
+  if(refreshInterval)clearInterval(refreshInterval);
+  refreshInterval=setInterval(syncAll,30000);
+}
+
+async function init(){
+  CATS.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;document.getElementById('pf-c').appendChild(o);});
+  SIZES.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;document.getElementById('pf-z').appendChild(o);});
+  ECATS.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;document.getElementById('ef-c').appendChild(o);});
+  document.getElementById('ef-dt').value=td();
+  await syncAll();
+  startAutoRefresh();
+  applyRole();
+  document.getElementById('ld').style.display='none';document.getElementById('app').style.display='';render();
+}
+
+// Auto-login if token exists, otherwise show login screen
+(function checkSession(){
+  document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  document.getElementById('login-user').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('login-pass').focus();});
+  if(authToken){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('ld').style.display='flex';
+    init();
+  }
+})();
+
+function sw(n,b){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));b.classList.add('active');['dash','inv','sales','exp','users'].forEach(t=>document.getElementById('t-'+t).style.display=t===n?'':'none');render();}
+function openModal(t){document.getElementById('m-'+t).classList.add('open');}
+function closeModal(t){document.getElementById('m-'+t).classList.remove('open');editPid=null;editEid=null;restockP=null;}
+
+function render(){rDash();rInv();rSales();rExp();if(isAdmin())rUsers();}
+
+function mkSC(ico,bg,col,lbl,val,sub){return`<div class="sc"><div class="scr"><div class="sci" style="background:${bg};color:${col}">${ico}</div><span class="scl">${lbl}</span></div><div class="scv" style="color:${col}">${val}</div>${sub?`<div class="scs">${sub}</div>`:''}</div>`;}
+
+function rDash(){
+  const ts=P.reduce((a,p)=>a+p.stock,0),tr=S.reduce((a,s)=>a+(s.total||0),0);
+  const tdr=S.filter(s=>s.date===td()).reduce((a,s)=>a+(s.total||0),0);
+  const te=E.reduce((a,e)=>a+(e.amount||0),0),mo=td().substring(0,7);
+  const me=E.filter(e=>e.date&&e.date.startsWith(mo)).reduce((a,e)=>a+(e.amount||0),0);
+  const pr=tr-te,ls=P.filter(p=>p.stock>0&&p.stock<=5),ns=P.filter(p=>p.stock===0);
+  const costVal=P.reduce((a,p)=>a+(p.avgCost||0)*p.stock,0);
+
+  let h=`<div class="sts">${mkSC('📦','var(--obg)','var(--o)','Produits',P.length,ts+' unités'+(isAdmin()?' · Valeur coût: '+fn(costVal)+' F':''))}${mkSC('💰','var(--tbg)','var(--t)','Ventes du jour',fn(tdr)+' FCFA',S.filter(s=>s.date===td()).length+' ventes')}${isAdmin()?mkSC('💸','var(--rbg)','var(--r)','Dépenses',fn(te)+' FCFA','Ce mois: '+fn(me)+' F'):''}${isAdmin()?mkSC('📊',pr>=0?'var(--tbg)':'var(--rbg)',pr>=0?'var(--t)':'var(--r)','Bénéfice net',fn(pr)+' FCFA',S.length+' ventes · '+E.length+' dépenses'):''}</div>`;
+  if(isAdmin()&&ns.length>0)h+=`<div class="al ali"><h4>📋 ${ns.length} produits sans stock — Cliquez +Stock dans l'Inventaire</h4></div>`;
+  if(isAdmin()&&ls.length>0)h+=`<div class="al alw"><h4>⚠️ Stock bas</h4><div class="tg">${ls.map(p=>`<span class="tgd">${p.sku||p.name} — ${p.stock}</span>`).join('')}</div></div>`;
+
+  // ── Monthly Sales & Expenses Breakdown (admin only) ──
+  if(isAdmin()){
+  const monthMap={};
+  S.forEach(s=>{
+    if(!s.date)return;
+    const k=s.date.substring(0,7); // YYYY-MM
+    if(!monthMap[k])monthMap[k]={sales:0,saleCount:0,expenses:0,expCount:0};
+    monthMap[k].sales+=(s.total||0);
+    monthMap[k].saleCount++;
+  });
+  E.forEach(e=>{
+    if(!e.date)return;
+    const k=e.date.substring(0,7);
+    if(!monthMap[k])monthMap[k]={sales:0,saleCount:0,expenses:0,expCount:0};
+    monthMap[k].expenses+=(e.amount||0);
+    monthMap[k].expCount++;
+  });
+  const monthNames=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  const months=Object.keys(monthMap).sort().reverse();
+
+  h+=`<div class="tc" style="margin-top:22px;margin-bottom:22px"><div class="tch"><h3>📊 Résumé mensuel</h3></div>`;
+
+  if(months.length===0){
+    h+=`<div class="emp">Enregistrez des ventes ou dépenses pour voir le résumé mensuel</div>`;
+  } else {
+    h+=`<div style="padding:20px 24px">`;
+    // Find the max value for the bar chart
+    const maxBar=Math.max(...months.map(k=>Math.max(monthMap[k].sales,monthMap[k].expenses)),1);
+
+    // Visual bar chart
+    h+=`<div style="display:flex;flex-direction:column;gap:16px;margin-bottom:24px">`;
+    months.forEach(k=>{
+      const d=monthMap[k];
+      const [y,m]=k.split('-');
+      const label=monthNames[parseInt(m)-1]+' '+y;
+      const profit=d.sales-d.expenses;
+      const salePct=Math.max((d.sales/maxBar)*100,2);
+      const expPct=Math.max((d.expenses/maxBar)*100,2);
+      h+=`<div>`;
+      h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-weight:600;font-size:14px">${label}</span><span style="font-size:13px;font-weight:700;color:${profit>=0?'var(--t)':'var(--r)'};">${profit>=0?'+':''}${fn(profit)} F</span></div>`;
+      h+=`<div style="display:flex;gap:6px;align-items:center;margin-bottom:3px"><span style="font-size:11px;color:var(--m);width:60px">Ventes</span><div style="flex:1;background:#f5f0eb;border-radius:6px;height:22px;overflow:hidden"><div style="height:100%;width:${salePct}%;background:var(--t);border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:11px;color:#fff;font-weight:600;white-space:nowrap">${fn(d.sales)} F</span></div></div><span style="font-size:11px;color:var(--m);width:32px;text-align:right">${d.saleCount}x</span></div>`;
+      h+=`<div style="display:flex;gap:6px;align-items:center"><span style="font-size:11px;color:var(--m);width:60px">Dépenses</span><div style="flex:1;background:#f5f0eb;border-radius:6px;height:22px;overflow:hidden"><div style="height:100%;width:${expPct}%;background:var(--r);border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:11px;color:#fff;font-weight:600;white-space:nowrap">${fn(d.expenses)} F</span></div></div><span style="font-size:11px;color:var(--m);width:32px;text-align:right">${d.expCount}x</span></div>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+
+    // Summary table
+    h+=`<div class="tsc"><table><thead><tr><th>Mois</th><th>Ventes</th><th>Nb ventes</th><th>Dépenses</th><th>Nb dépenses</th><th>Bénéfice</th><th>Marge</th></tr></thead><tbody>`;
+    months.forEach(k=>{
+      const d=monthMap[k];
+      const [y,m]=k.split('-');
+      const label=monthNames[parseInt(m)-1]+' '+y;
+      const profit=d.sales-d.expenses;
+      const margin=d.sales>0?((profit/d.sales)*100).toFixed(1):'—';
+      h+=`<tr><td class="bold">${label}</td><td class="bold grn">${fn(d.sales)} F</td><td>${d.saleCount}</td><td class="bold red">${fn(d.expenses)} F</td><td>${d.expCount}</td><td class="bold" style="color:${profit>=0?'var(--t)':'var(--r)'};">${profit>=0?'+':''}${fn(profit)} F</td><td>${margin}${margin!=='—'?'%':''}</td></tr>`;
+    });
+    // Totals row
+    const totS=months.reduce((a,k)=>a+monthMap[k].sales,0),totSC=months.reduce((a,k)=>a+monthMap[k].saleCount,0);
+    const totE2=months.reduce((a,k)=>a+monthMap[k].expenses,0),totEC=months.reduce((a,k)=>a+monthMap[k].expCount,0);
+    const totP=totS-totE2,totM=totS>0?((totP/totS)*100).toFixed(1):'—';
+    h+=`<tr style="background:#faf8f5;font-weight:700"><td>TOTAL</td><td class="grn">${fn(totS)} F</td><td>${totSC}</td><td class="red">${fn(totE2)} F</td><td>${totEC}</td><td style="color:${totP>=0?'var(--t)':'var(--r)'};">${totP>=0?'+':''}${fn(totP)} F</td><td>${totM}${totM!=='—'?'%':''}</td></tr>`;
+    h+=`</tbody></table></div></div>`;
+  }
+  h+=`</div>`;
+  } // end isAdmin monthly summary
+
+  h+=`<div class="tc"><div class="tch"><h3>Ventes récentes</h3></div><div class="tsc"><table><thead><tr><th>Produit</th><th>Qté</th><th>Prix unit.</th><th>Total</th><th>Date</th><th>Paiement</th></tr></thead><tbody>`;
+  if(!S.length)h+=`<tr><td colspan="6" class="emp">Aucune vente</td></tr>`;
+  else S.slice(0,5).forEach(s=>{h+=`<tr><td class="bold">${s.productName}</td><td>${s.quantity}</td><td>${fn(s.unitPrice)} F</td><td class="bold grn">${fn(s.total)} F</td><td style="color:var(--m)">${fd(s.date)}</td><td><span class="badge ${pb(s.payment)}">${s.payment}</span></td></tr>`;});
+  h+=`</tbody></table></div></div>`;
+  document.getElementById('t-dash').innerHTML=h;
+}
+
+function rInv(){
+  const f=P.filter(p=>{const ms=(p.name||'').toLowerCase().includes(search.toLowerCase())||(p.sku||'').toLowerCase().includes(search.toLowerCase());return ms&&(fCat==='Tous'||p.category===fCat);});
+  let co=`<option value="Tous">Toutes catégories</option>`+CATS.map(c=>`<option${fCat===c?' selected':''}>${c}</option>`).join('');
+  let h=`<div class="tb"><div class="srch"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Rechercher par nom ou REF..." value="${search}" oninput="search=this.value;rInv()"></div><select onchange="fCat=this.value;rInv()">${co}</select>${isAdmin()?'<button class="btn bp" onclick="openProdAdd()">＋ Ajouter</button>':''}</div>`;
+  const adm=isAdmin();
+  h+=`<div class="tc"><div class="tsc"><table><thead><tr><th>REF</th><th>Produit</th><th>Cat.</th><th>Taille</th><th>Prix</th>${adm?'<th>Coût actuel</th><th>Coût moyen</th>':''}<th>Stock</th>${adm?'<th>Actions</th>':''}</tr></thead><tbody>`;
+  if(!f.length)h+=`<tr><td colspan="${adm?9:5}" class="emp">Aucun produit</td></tr>`;
+  else f.forEach(p=>{
+    const sc2=p.stock===0?'stk0':p.stock<=5?'stkl':p.stock<=10?'stkm':'stko';
+    const margin=p.price>0&&p.avgCost>0?Math.round(((p.price-p.avgCost)/p.price)*100):-1;
+    h+=`<tr><td class="mono">${p.sku||''}</td><td class="bold">${p.name}</td><td><span class="badge bcat">${p.category}</span></td><td>${p.size}</td>`;
+    h+=`<td class="bold">${p.price>0?fn(p.price):'<span class="red" style="font-size:12px">—</span>'}</td>`;
+    if(adm){
+      h+=`<td>${p.costPrice>0?'<span class="pur">'+fn(p.costPrice)+'</span>':'<span style="color:var(--m)">—</span>'}</td>`;
+      h+=`<td>${p.avgCost>0?'<span class="pur bold">'+fn(p.avgCost)+'</span>'+(margin>=0?' <span style="font-size:11px;color:var(--t)">('+margin+'%)</span>':''):'<span style="color:var(--m)">—</span>'}</td>`;
+    }
+    h+=`<td><span class="stk ${sc2}">${p.stock}</span></td>`;
+    if(adm) h+=`<td><div style="display:flex;gap:5px"><button class="btn bf bs" style="color:var(--t);font-weight:700" onclick="openRestock('${p.id}')">+Stock</button><button class="btn bf bs" onclick="editProd('${p.id}')">✏️</button><button class="btn bf bs" style="color:var(--r)" onclick="delProd('${p.id}')">🗑</button></div></td>`;
+    h+=`</tr>`;
+  });
+  h+=`</tbody></table></div></div>`;
+  document.getElementById('t-inv').innerHTML=h;
+}
+
+function rSales(){
+  const tr=S.reduce((a,s)=>a+(s.total||0),0),av=S.length?Math.round(tr/S.length):0;
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px"><h2 style="font-family:var(--fd);font-size:20px;font-weight:700">Ventes</h2><button class="btn bp" onclick="openModal('sale')">＋ Nouvelle vente</button></div>`;
+  h+=`<div class="sts">${mkSC('🛒','var(--obg)','var(--o)','Total',S.length,'')}${mkSC('💰','var(--tbg)','var(--t)','Revenus',fn(tr)+' F','')}${mkSC('📊','var(--ibg)','var(--i)','Moyenne',fn(av)+' F','')}</div>`;
+  h+=`<div class="tc"><div class="tsc"><table><thead><tr><th>Produit</th><th>Qté</th><th>Prix unit.</th><th>Total</th><th>Date</th><th>Paiement</th></tr></thead><tbody>`;
+  if(!S.length)h+=`<tr><td colspan="6" class="emp">Aucune vente</td></tr>`;
+  else S.forEach(s=>{h+=`<tr><td class="bold">${s.productName}</td><td>${s.quantity}</td><td>${fn(s.unitPrice)} F</td><td class="bold grn">${fn(s.total)} F</td><td style="color:var(--m)">${fd(s.date)}</td><td><span class="badge ${pb(s.payment)}">${s.payment}</span></td></tr>`;});
+  h+=`</tbody></table></div></div>`;
+  document.getElementById('t-sales').innerHTML=h;
+}
+
+function rExp(){
+  const te=E.reduce((a,e)=>a+(e.amount||0),0),mo=td().substring(0,7);
+  const me=E.filter(e=>e.date&&e.date.startsWith(mo)).reduce((a,e)=>a+(e.amount||0),0);
+  const tr=S.reduce((a,s)=>a+(s.total||0),0),pr=tr-te;
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px"><h2 style="font-family:var(--fd);font-size:20px;font-weight:700">Dépenses</h2><button class="btn br" onclick="openExpAdd()">＋ Nouvelle dépense</button></div>`;
+  h+=`<div class="sts">${mkSC('💸','var(--rbg)','var(--r)','Total',fn(te)+' F','')}${mkSC('📅','var(--obg)','var(--o)','Ce mois',fn(me)+' F','')}${mkSC('📊',pr>=0?'var(--tbg)':'var(--rbg)',pr>=0?'var(--t)':'var(--r)','Bénéfice',fn(pr)+' F','')}</div>`;
+  h+=`<div class="tc"><div class="tsc"><table><thead><tr><th>Date</th><th>Description</th><th>Catégorie</th><th>Montant</th><th>Notes</th><th>Actions</th></tr></thead><tbody>`;
+  if(!E.length)h+=`<tr><td colspan="6" class="emp">Aucune dépense</td></tr>`;
+  else E.forEach(e=>{h+=`<tr><td style="color:var(--m)">${fd(e.date)}</td><td class="bold">${e.description}</td><td><span class="ecat" style="${ecc(e.category)}">${e.category}</span></td><td class="bold red">${fn(e.amount)} F</td><td style="color:var(--m);font-size:13px">${e.notes||'—'}</td><td><div style="display:flex;gap:5px"><button class="btn bf bs" onclick="editExp('${e.id}')">✏️</button><button class="btn bf bs" style="color:var(--r)" onclick="delExp('${e.id}')">🗑</button></div></td></tr>`;});
+  h+=`</tbody></table></div></div>`;
+  document.getElementById('t-exp').innerHTML=h;
+}
+
+// ── Product ──
+function openProdAdd(){editPid=null;document.getElementById('mp-t').textContent='Ajouter un produit';document.getElementById('pf-sv').textContent='Ajouter';document.getElementById('pf-n').value='';document.getElementById('pf-s').value='';document.getElementById('pf-p').value='';document.getElementById('pf-st').value='';openModal('product');}
+
+function editProd(id){
+  const p=P.find(x=>x.id===id);if(!p)return;editPid=id;
+  document.getElementById('mp-t').textContent='Modifier';document.getElementById('pf-sv').textContent='Enregistrer';
+  document.getElementById('pf-n').value=p.name;document.getElementById('pf-s').value=p.sku||'';
+  document.getElementById('pf-c').value=p.category;document.getElementById('pf-z').value=p.size;
+  document.getElementById('pf-p').value=p.price||'';document.getElementById('pf-st').value=p.stock||'';
+  openModal('product');
+}
+
+async function saveProd(){
+  const n=document.getElementById('pf-n').value.trim(),sk=document.getElementById('pf-s').value.trim();
+  if(!n)return alert('Nom requis');
+  const d={name:n,sku:sk,category:document.getElementById('pf-c').value,size:document.getElementById('pf-z').value,price:parseFloat(document.getElementById('pf-p').value)||0,stock:parseInt(document.getElementById('pf-st').value)||0};
+  try{
+    if(editPid){
+      await apiPut('/api/products/'+editPid,d);
+    } else {
+      const id=gid();
+      await apiPost('/api/products',{id,...d,costPrice:0,avgCost:0});
+    }
+    await syncAll();
+  }catch(e){console.error(e);}
+  closeModal('product');render();
+}
+
+async function delProd(id){if(!confirm('Supprimer ?'))return;try{await apiDel('/api/products/'+id);await syncAll();}catch(e){console.error(e);}render();}
+
+// ── Restock ──
+function openRestock(id){
+  const p=P.find(x=>x.id===id);if(!p)return;restockP=p;
+  document.getElementById('mr-t').textContent='Réappro: '+(p.sku||p.name);
+  document.getElementById('mr-info').innerHTML=`<div class="bold" style="font-size:16px;margin-bottom:4px">${p.name}</div><div style="font-size:13px;color:#78716c">Stock: <strong style="color:var(--ink)">${p.stock}</strong>${p.costPrice>0?' · Dernier coût: <strong class="pur">'+fn(p.costPrice)+' F</strong>':''}${p.avgCost>0?' · Coût moyen: <strong class="pur">'+fn(p.avgCost)+' F</strong>':''}</div>`;
+  document.getElementById('rf-q').value='';document.getElementById('rf-c').value='';
+  document.getElementById('mr-prev').style.display='none';
+  openModal('restock');
+}
+
+function uRP(){
+  if(!restockP)return;
+  const q=parseInt(document.getElementById('rf-q').value)||0,c=parseFloat(document.getElementById('rf-c').value)||0;
+  const pr=document.getElementById('mr-prev');
+  if(q>0&&c>0){
+    const ns=restockP.stock+q;
+    const na=restockP.stock===0?c:Math.round(((restockP.stock*(restockP.avgCost||0))+(q*c))/ns);
+    pr.innerHTML=`<strong>Après réappro:</strong><br>Stock: <strong>${restockP.stock} → ${ns}</strong><br>Coût moyen: <strong class="pur">${fn(na)} FCFA</strong>`;
+    pr.style.display='';
+  } else pr.style.display='none';
+}
+
+async function doRestock(){
+  if(!restockP)return;
+  const q=parseInt(document.getElementById('rf-q').value)||0,c=parseFloat(document.getElementById('rf-c').value)||0;
+  if(q<=0||c<=0)return alert('Quantité et coût requis');
+  try{
+    await apiPost('/api/products/'+restockP.id+'/restock',{qty:q,costPrice:c});
+    await syncAll();
+  }catch(e){console.error(e);}
+  closeModal('restock');render();
+}
+
+// ── Sale ──
+function onSPC(){const p=P.find(x=>x.id===document.getElementById('sf-p').value);document.getElementById('sf-pr').value=p&&p.price>0?p.price:'';uST();}
+function uST(){const pr=parseFloat(document.getElementById('sf-pr').value)||0,q=parseInt(document.getElementById('sf-q').value)||0;if(pr>0&&q>0){document.getElementById('sf-t').textContent=fn(pr*q)+' FCFA';document.getElementById('sf-tr').style.display='';}else document.getElementById('sf-tr').style.display='none';}
+
+async function recSale(){
+  const pid=document.getElementById('sf-p').value,p=P.find(x=>x.id===pid);
+  if(!p)return alert('Sélectionnez un produit');
+  const pr=parseFloat(document.getElementById('sf-pr').value)||0,q=parseInt(document.getElementById('sf-q').value)||0;
+  if(pr<=0||q<=0)return alert('Prix et quantité requis');
+  const id=gid(),s={id,productName:p.name,quantity:q,unitPrice:pr,total:pr*q,date:td(),payment:document.getElementById('sf-pay').value,productId:pid};
+  try{
+    await apiPost('/api/sales',s);
+    await syncAll();
+  }catch(e){console.error(e);}
+  closeModal('sale');document.getElementById('sf-p').value='';document.getElementById('sf-pr').value='';document.getElementById('sf-q').value='1';document.getElementById('sf-tr').style.display='none';render();
+}
+
+// ── Expense ──
+function openExpAdd(){editEid=null;document.getElementById('me-t').textContent='Ajouter une dépense';document.getElementById('ef-sv').textContent='Ajouter';document.getElementById('ef-d').value='';document.getElementById('ef-a').value='';document.getElementById('ef-dt').value=td();document.getElementById('ef-n').value='';openModal('expense');}
+
+function editExp(id){
+  const e=E.find(x=>x.id===id);if(!e)return;editEid=id;
+  document.getElementById('me-t').textContent='Modifier';document.getElementById('ef-sv').textContent='Enregistrer';
+  document.getElementById('ef-d').value=e.description;document.getElementById('ef-c').value=e.category;
+  document.getElementById('ef-a').value=e.amount;document.getElementById('ef-dt').value=e.date;document.getElementById('ef-n').value=e.notes||'';
+  openModal('expense');
+}
+
+async function saveExp(){
+  const d=document.getElementById('ef-d').value.trim(),a=parseFloat(document.getElementById('ef-a').value)||0;
+  if(!d||a<=0)return alert('Description et montant requis');
+  const data={description:d,category:document.getElementById('ef-c').value,amount:a,date:document.getElementById('ef-dt').value,notes:document.getElementById('ef-n').value.trim()};
+  try{
+    if(editEid){
+      await apiPut('/api/expenses/'+editEid,data);
+    } else {
+      const id=gid();
+      await apiPost('/api/expenses',{id,...data});
+    }
+    await syncAll();
+  }catch(e){console.error(e);}
+  closeModal('expense');render();
+}
+
+async function delExp(id){if(!confirm('Supprimer ?'))return;try{await apiDel('/api/expenses/'+id);await syncAll();}catch(e){console.error(e);}render();}
+
+// ── Users ──
+function rUsers(){
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px"><h2 style="font-family:var(--fd);font-size:20px;font-weight:700">Utilisateurs</h2></div>`;
+
+  // Add user form
+  h+=`<div class="tc" style="margin-bottom:22px"><div class="tch"><h3>Ajouter un utilisateur</h3></div><div style="padding:20px 24px"><div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">`;
+  h+=`<div style="flex:1;min-width:160px"><label>Nom d'utilisateur</label><input id="uf-name" placeholder="ex: marie"></div>`;
+  h+=`<div style="flex:1;min-width:160px"><label>Mot de passe</label><input id="uf-pass" type="text" placeholder="min 4 caractères"></div>`;
+  h+=`<div style="min-width:140px"><label>Rôle</label><select id="uf-role"><option value="cashier">Caissier</option><option value="admin">Admin</option></select></div>`;
+  h+=`<button class="btn bp" onclick="addUser()">Ajouter</button>`;
+  h+=`</div><div id="uf-err" style="display:none;color:var(--r);font-size:13px;font-weight:600;margin-top:10px"></div></div></div>`;
+
+  // Users table
+  h+=`<div class="tc"><div class="tsc"><table><thead><tr><th>Utilisateur</th><th>Rôle</th><th>Créé le</th><th>Actions</th></tr></thead><tbody>`;
+  if(!U.length)h+=`<tr><td colspan="4" class="emp">Aucun utilisateur</td></tr>`;
+  else U.forEach(u=>{
+    const isSelf=u.username===userName;
+    h+=`<tr><td class="bold">${u.username}${isSelf?' <span style="font-size:11px;color:var(--m)">(vous)</span>':''}</td>`;
+    h+=`<td><span class="badge ${u.role==='admin'?'bcard':'bcash'}">${u.role==='admin'?'Admin':'Caissier'}</span></td>`;
+    h+=`<td style="color:var(--m)">${fd(u.created_at?u.created_at.split('T')[0]:'')}</td>`;
+    h+=`<td><div style="display:flex;gap:5px">`;
+    h+=`<button class="btn bf bs" onclick="promptChangePass('${u.username}')">Mot de passe</button>`;
+    if(!isSelf)h+=`<button class="btn bf bs" style="color:var(--r)" onclick="delUser('${u.username}')">Supprimer</button>`;
+    h+=`</div></td></tr>`;
+  });
+  h+=`</tbody></table></div></div>`;
+  document.getElementById('t-users').innerHTML=h;
+}
+
+async function addUser(){
+  const nameEl=document.getElementById('uf-name'),passEl=document.getElementById('uf-pass');
+  const n=nameEl.value.trim(),p=passEl.value,r=document.getElementById('uf-role').value;
+  const err=document.getElementById('uf-err');
+  if(!n||!p){err.textContent='Nom et mot de passe requis';err.style.display='';return;}
+  try{
+    await apiPost('/api/users',{username:n,password:p,role:r});
+    err.style.display='none';nameEl.value='';passEl.value='';
+    await syncAll();
+  }catch(e){
+    err.textContent=e.message||'Erreur lors de la création';
+    err.style.display='';
+  }
+}
+
+async function promptChangePass(uname){
+  const np=prompt('Nouveau mot de passe pour '+uname+' (min 4 caractères):');
+  if(!np)return;
+  if(np.length<4)return alert('Mot de passe trop court (min 4 caractères)');
+  try{await apiPut('/api/users/'+uname,{password:np});alert('Mot de passe modifié');await syncAll();}catch(e){alert('Erreur');}
+}
+
+async function delUser(uname){
+  if(!confirm('Supprimer l\'utilisateur '+uname+' ?'))return;
+  try{await apiDel('/api/users/'+uname);await syncAll();}catch(e){alert('Erreur');}
+}
+
+// ── CSV ──
+function xCSV(t){
+  let csv,fn2;
+  if(t==='products'){csv='REF,Nom,Catégorie,Taille,Prix vente,Coût actuel,Coût moyen,Stock\n'+P.map(p=>`"${p.sku}","${p.name}","${p.category}","${p.size}",${p.price},${p.costPrice||0},${p.avgCost||0},${p.stock}`).join('\n');fn2='olam-produits.csv';}
+  else if(t==='sales'){csv='Produit,Quantité,Prix Unitaire,Total,Date,Paiement\n'+S.map(s=>`"${s.productName}",${s.quantity},${s.unitPrice},${s.total},"${s.date}","${s.payment}"`).join('\n');fn2='olam-ventes.csv';}
+  else{csv='Description,Catégorie,Montant,Date,Notes\n'+E.map(e=>`"${e.description}","${e.category}",${e.amount},"${e.date}","${e.notes||''}"`).join('\n');fn2='olam-depenses.csv';}
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));a.download=fn2;a.click();
+}
+
+function refreshSD(){
+  const sel=document.getElementById('sf-p'),cur=sel.value;
+  sel.innerHTML='<option value="">Sélectionner...</option>'+P.map(p=>`<option value="${p.id}"${p.id===cur?' selected':''}>${p.sku?p.sku+' — ':''}${p.name}${p.stock>0?' ('+p.stock+')':''}</option>`).join('');
+}
+const _om=openModal;openModal=function(t){if(t==='sale')refreshSD();_om(t);};
+</script>
+</body>
+</html>
