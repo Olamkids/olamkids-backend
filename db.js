@@ -41,6 +41,7 @@ function initTables() {
       quantity INTEGER DEFAULT 1,
       unitPrice REAL DEFAULT 0,
       total REAL DEFAULT 0,
+      discount REAL DEFAULT 0,
       date TEXT NOT NULL,
       payment TEXT DEFAULT 'Espèces',
       created_at TEXT DEFAULT (datetime('now'))
@@ -63,6 +64,9 @@ function initTables() {
       created_at TEXT DEFAULT (datetime('now'))
     );
   `);
+
+  // Migrations — add columns to existing tables
+  try { db.prepare('ALTER TABLE sales ADD COLUMN discount REAL DEFAULT 0').run(); } catch(e) { /* column already exists */ }
 }
 
 function seedIfEmpty() {

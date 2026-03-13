@@ -166,13 +166,13 @@ app.get('/api/sales', (req, res) => {
 
 app.post('/api/sales', (req, res) => {
   const db = getDb();
-  const { id, productName, quantity, unitPrice, total, date, payment, productId } = req.body;
+  const { id, productName, quantity, unitPrice, total, discount, date, payment, productId } = req.body;
   const sid = id || 'o_' + Math.random().toString(36).substr(2, 9);
 
   db.prepare(`
-    INSERT INTO sales (id, productName, quantity, unitPrice, total, date, payment)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `).run(sid, productName, quantity || 1, unitPrice || 0, total || 0, date, payment || 'Espèces');
+    INSERT INTO sales (id, productName, quantity, unitPrice, total, discount, date, payment)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(sid, productName, quantity || 1, unitPrice || 0, total || 0, discount || 0, date, payment || 'Espèces');
 
   // Deduct stock if productId provided
   if (productId) {
@@ -272,9 +272,9 @@ app.post('/api/import', adminOnly, (req, res) => {
       }
     }
     if (sales && sales.length) {
-      const stmt = db.prepare('INSERT INTO sales (id, productName, quantity, unitPrice, total, date, payment) VALUES (?, ?, ?, ?, ?, ?, ?)');
+      const stmt = db.prepare('INSERT INTO sales (id, productName, quantity, unitPrice, total, discount, date, payment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
       for (const s of sales) {
-        stmt.run(s.id, s.productName, s.quantity || 1, s.unitPrice || 0, s.total || 0, s.date, s.payment || '');
+        stmt.run(s.id, s.productName, s.quantity || 1, s.unitPrice || 0, s.total || 0, s.discount || 0, s.date, s.payment || '');
       }
     }
     if (expenses && expenses.length) {
