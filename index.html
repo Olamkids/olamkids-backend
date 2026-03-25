@@ -59,6 +59,7 @@ tbody tr:hover{background:#fffcf7}
 .badge{display:inline-block;padding:3px 11px;border-radius:12px;font-size:12px;font-weight:600}
 .bcard{background:var(--ibg);color:var(--i)}.bcash{background:var(--tbg);color:var(--t)}.bmm{background:var(--obg);color:var(--o)}.bwa{background:#dcfce7;color:#16a34a}
 .bcat{background:#f5f0eb;color:#78716c;font-weight:500}
+.bdel{background:#eff6ff;color:#2563eb}.bpic{background:#f0fdf4;color:#16a34a}
 .stk{padding:3px 11px;border-radius:12px;font-size:13px;font-weight:700}
 .stk0{background:#f5f0eb;color:var(--m)}.stkl{background:var(--rbg);color:var(--r)}.stkm{background:#fef9c3;color:#a16207}.stko{background:var(--tbg);color:var(--t)}
 .emp{padding:52px 16px;text-align:center;color:var(--m);font-size:15px}
@@ -156,6 +157,7 @@ label{display:block;margin-bottom:5px;font-size:13px;font-weight:600;color:#5753
   <div><label>Produit *</label><select id="sf-p" onchange="onSPC()"><option value="">Sélectionner...</option></select></div>
   <div class="fr"><div><label>Prix unitaire (FCFA) *</label><input id="sf-pr" type="number" placeholder="0" oninput="uST()"></div><div><label>Quantité</label><input id="sf-q" type="number" min="1" value="1" oninput="uST()"></div></div>
   <div class="fr"><div><label>Remise (FCFA)</label><input id="sf-disc" type="number" min="0" placeholder="0" oninput="uST()"></div><div><label>Paiement</label><select id="sf-pay"><option>Carte</option><option>Espèces</option><option>Mobile Money</option><option>WhatsApp</option></select></div></div>
+  <div><label>Type de commande</label><select id="sf-ful"><option value="Retrait">🏪 Retrait en boutique</option><option value="Livraison">🚚 Livraison</option></select></div>
   <div id="sf-tr" class="stot" style="display:none"><strong>Total: </strong><span id="sf-t">0 FCFA</span></div>
   <div class="fa"><button class="btn bf" onclick="closeModal('sale')">Annuler</button><button class="btn bt" onclick="recSale()">Enregistrer</button></div>
 </div></div></div>
@@ -191,6 +193,7 @@ const td=()=>new Date().toISOString().split('T')[0];
 const fd=d=>{if(!d||d.length<10)return d;const[y,m,dd]=d.split('-');return`${dd}-${m}-${y}`;};
 const fn=n=>Number(n).toLocaleString('fr-FR');
 const pb=p=>p==='Carte'?'bcard':p==='Espèces'?'bcash':p==='Mobile Money'?'bmm':'bwa';
+const pf=f=>f==='Livraison'?'bdel':'bpic';
 const ecc=c=>c==='Loyer'?'background:var(--obg);color:var(--o)':c==='Salaires'?'background:var(--ibg);color:var(--i)':'background:#f5f0eb;color:#78716c';
 
 let P=[],S=[],E=[],U=[],editPid=null,editEid=null,restockP=null,search='',fCat='Tous',online=false;
@@ -393,9 +396,9 @@ function rDash(){
   h+=`</div>`;
   } // end isAdmin monthly summary
 
-  h+=`<div class="tc"><div class="tch"><h3>Ventes récentes</h3></div><div class="tsc"><table><thead><tr><th>Produit</th><th>Qté</th><th>Prix unit.</th><th>Remise</th><th>Total</th><th>Date</th><th>Paiement</th></tr></thead><tbody>`;
-  if(!S.length)h+=`<tr><td colspan="7" class="emp">Aucune vente</td></tr>`;
-  else S.slice(0,5).forEach(s=>{h+=`<tr><td class="bold">${s.productName}</td><td>${s.quantity}</td><td>${fn(s.unitPrice)} F</td><td>${s.discount?'<span class="red">-'+fn(s.discount)+' F</span>':'—'}</td><td class="bold grn">${fn(s.total)} F</td><td style="color:var(--m)">${fd(s.date)}</td><td><span class="badge ${pb(s.payment)}">${s.payment}</span></td></tr>`;});
+  h+=`<div class="tc"><div class="tch"><h3>Ventes récentes</h3></div><div class="tsc"><table><thead><tr><th>Produit</th><th>Qté</th><th>Prix unit.</th><th>Remise</th><th>Total</th><th>Date</th><th>Paiement</th><th>Type</th></tr></thead><tbody>`;
+  if(!S.length)h+=`<tr><td colspan="8" class="emp">Aucune vente</td></tr>`;
+  else S.slice(0,5).forEach(s=>{h+=`<tr><td class="bold">${s.productName}</td><td>${s.quantity}</td><td>${fn(s.unitPrice)} F</td><td>${s.discount?'<span class="red">-'+fn(s.discount)+' F</span>':'—'}</td><td class="bold grn">${fn(s.total)} F</td><td style="color:var(--m)">${fd(s.date)}</td><td><span class="badge ${pb(s.payment)}">${s.payment}</span></td><td><span class="badge ${pf(s.fulfillment)}">${s.fulfillment==='Livraison'?'🚚 Livraison':'🏪 Retrait'}</span></td></tr>`;});
   h+=`</tbody></table></div></div>`;
   document.getElementById('t-dash').innerHTML=h;
 }
@@ -428,9 +431,9 @@ function rSales(){
   const tr=S.reduce((a,s)=>a+(s.total||0),0),av=S.length?Math.round(tr/S.length):0;
   let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px"><h2 style="font-family:var(--fd);font-size:20px;font-weight:700">Ventes</h2><button class="btn bp" onclick="openModal('sale')">＋ Nouvelle vente</button></div>`;
   h+=`<div class="sts">${mkSC('🛒','var(--obg)','var(--o)','Total',S.length,'')}${mkSC('💰','var(--tbg)','var(--t)','Revenus',fn(tr)+' F','')}${mkSC('📊','var(--ibg)','var(--i)','Moyenne',fn(av)+' F','')}</div>`;
-  h+=`<div class="tc"><div class="tsc"><table><thead><tr><th>Produit</th><th>Qté</th><th>Prix unit.</th><th>Remise</th><th>Total</th><th>Date</th><th>Paiement</th></tr></thead><tbody>`;
-  if(!S.length)h+=`<tr><td colspan="7" class="emp">Aucune vente</td></tr>`;
-  else S.forEach(s=>{h+=`<tr><td class="bold">${s.productName}</td><td>${s.quantity}</td><td>${fn(s.unitPrice)} F</td><td>${s.discount?'<span class="red">-'+fn(s.discount)+' F</span>':'—'}</td><td class="bold grn">${fn(s.total)} F</td><td style="color:var(--m)">${fd(s.date)}</td><td><span class="badge ${pb(s.payment)}">${s.payment}</span></td></tr>`;});
+  h+=`<div class="tc"><div class="tsc"><table><thead><tr><th>Produit</th><th>Qté</th><th>Prix unit.</th><th>Remise</th><th>Total</th><th>Date</th><th>Paiement</th><th>Type</th></tr></thead><tbody>`;
+  if(!S.length)h+=`<tr><td colspan="8" class="emp">Aucune vente</td></tr>`;
+  else S.forEach(s=>{h+=`<tr><td class="bold">${s.productName}</td><td>${s.quantity}</td><td>${fn(s.unitPrice)} F</td><td>${s.discount?'<span class="red">-'+fn(s.discount)+' F</span>':'—'}</td><td class="bold grn">${fn(s.total)} F</td><td style="color:var(--m)">${fd(s.date)}</td><td><span class="badge ${pb(s.payment)}">${s.payment}</span></td><td><span class="badge ${pf(s.fulfillment)}">${s.fulfillment==='Livraison'?'🚚 Livraison':'🏪 Retrait'}</span></td></tr>`;});
   h+=`</tbody></table></div></div>`;
   document.getElementById('t-sales').innerHTML=h;
 }
@@ -521,12 +524,12 @@ async function recSale(){
   const pr=parseFloat(document.getElementById('sf-pr').value)||0,q=parseInt(document.getElementById('sf-q').value)||0,disc=parseFloat(document.getElementById('sf-disc').value)||0;
   if(pr<=0||q<=0)return alert('Prix et quantité requis');
   const tot=Math.max(0,pr*q-disc);
-  const id=gid(),s={id,productName:p.name,quantity:q,unitPrice:pr,total:tot,discount:disc,date:td(),payment:document.getElementById('sf-pay').value,productId:pid};
+  const id=gid(),s={id,productName:p.name,quantity:q,unitPrice:pr,total:tot,discount:disc,date:td(),payment:document.getElementById('sf-pay').value,fulfillment:document.getElementById('sf-ful').value,productId:pid};
   try{
     await apiPost('/api/sales',s);
     await syncAll();
   }catch(e){console.error(e);}
-  closeModal('sale');document.getElementById('sf-p').value='';document.getElementById('sf-pr').value='';document.getElementById('sf-q').value='1';document.getElementById('sf-disc').value='';document.getElementById('sf-tr').style.display='none';render();
+  closeModal('sale');document.getElementById('sf-p').value='';document.getElementById('sf-pr').value='';document.getElementById('sf-q').value='1';document.getElementById('sf-disc').value='';document.getElementById('sf-ful').value='Retrait';document.getElementById('sf-tr').style.display='none';render();
 }
 
 // ── Expense ──
@@ -618,7 +621,7 @@ async function delUser(uname){
 function xCSV(t){
   let csv,fn2;
   if(t==='products'){csv='REF,Nom,Catégorie,Taille,Prix vente,Coût actuel,Coût moyen,Stock\n'+P.map(p=>`"${p.sku}","${p.name}","${p.category}","${p.size}",${p.price},${p.costPrice||0},${p.avgCost||0},${p.stock}`).join('\n');fn2='olam-produits.csv';}
-  else if(t==='sales'){csv='Produit,Quantité,Prix Unitaire,Remise,Total,Date,Paiement\n'+S.map(s=>`"${s.productName}",${s.quantity},${s.unitPrice},${s.discount||0},${s.total},"${s.date}","${s.payment}"`).join('\n');fn2='olam-ventes.csv';}
+  else if(t==='sales'){csv='Produit,Quantité,Prix Unitaire,Remise,Total,Date,Paiement,Type\n'+S.map(s=>`"${s.productName}",${s.quantity},${s.unitPrice},${s.discount||0},${s.total},"${s.date}","${s.payment}","${s.fulfillment||'Retrait'}"`).join('\n');fn2='olam-ventes.csv';}
   else{csv='Description,Catégorie,Montant,Date,Notes\n'+E.map(e=>`"${e.description}","${e.category}",${e.amount},"${e.date}","${e.notes||''}"`).join('\n');fn2='olam-depenses.csv';}
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));a.download=fn2;a.click();
 }

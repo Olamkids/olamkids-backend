@@ -67,6 +67,7 @@ function initTables() {
 
   // Migrations — add columns to existing tables
   try { db.prepare('ALTER TABLE sales ADD COLUMN discount REAL DEFAULT 0').run(); } catch(e) { /* column already exists */ }
+  try { db.prepare("ALTER TABLE sales ADD COLUMN fulfillment TEXT DEFAULT 'Retrait'").run(); } catch(e) { /* column already exists */ }
 }
 
 function seedIfEmpty() {
