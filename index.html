@@ -117,7 +117,7 @@ label{display:block;margin-bottom:5px;font-size:13px;font-weight:600;color:#5753
   <div class="ha">
     <span id="hdr-user" style="background:rgba(255,255,255,.2);color:#fff;padding:8px 16px;border-radius:11px;font-size:13px;font-weight:600;backdrop-filter:blur(8px)"></span>
     <button id="btn-add" class="btn bg" onclick="openModal('product')">＋ Ajouter</button>
-    <button class="btn bg" onclick="openModal('sale')">🛒 Vente</button>
+    <button class="btn bg" onclick="openSaleAdd()">🛒 Vente</button>
     <button id="btn-expense" class="btn bg" onclick="openModal('expense')">💸 Dépense</button>
     <button class="btn bg" onclick="doLogout()" style="font-size:13px">Déconnexion</button>
   </div>
@@ -152,14 +152,14 @@ label{display:block;margin-bottom:5px;font-size:13px;font-weight:600;color:#5753
 </div></div></div>
 
 <!-- Sale Modal -->
-<div id="m-sale" class="mo" onclick="if(event.target===this)closeModal('sale')"><div class="mob"><div class="moh"><h2>Enregistrer une vente</h2><button class="mox" onclick="closeModal('sale')">✕</button></div>
+<div id="m-sale" class="mo" onclick="if(event.target===this)closeModal('sale')"><div class="mob"><div class="moh"><h2 id="ms-t">Enregistrer une vente</h2><button class="mox" onclick="closeModal('sale')">✕</button></div>
 <div class="fg">
   <div><label>Produit *</label><select id="sf-p" onchange="onSPC()"><option value="">Sélectionner...</option></select></div>
   <div class="fr"><div><label>Prix unitaire (FCFA) *</label><input id="sf-pr" type="number" placeholder="0" oninput="uST()"></div><div><label>Quantité</label><input id="sf-q" type="number" min="1" value="1" oninput="uST()"></div></div>
   <div class="fr"><div><label>Remise (FCFA)</label><input id="sf-disc" type="number" min="0" placeholder="0" oninput="uST()"></div><div><label>Paiement</label><select id="sf-pay"><option>Carte</option><option>Espèces</option><option>Mobile Money</option><option>WhatsApp</option></select></div></div>
-  <div><label>Type de commande</label><select id="sf-ful"><option value="Retrait">🏪 Retrait en boutique</option><option value="Livraison">🚚 Livraison</option></select></div>
+  <div class="fr"><div><label>Type de commande</label><select id="sf-ful"><option value="Retrait">🏪 Retrait en boutique</option><option value="Livraison">🚚 Livraison</option></select></div><div><label>Date</label><input id="sf-dt" type="date"></div></div>
   <div id="sf-tr" class="stot" style="display:none"><strong>Total: </strong><span id="sf-t">0 FCFA</span></div>
-  <div class="fa"><button class="btn bf" onclick="closeModal('sale')">Annuler</button><button class="btn bt" onclick="recSale()">Enregistrer</button></div>
+  <div class="fa"><button class="btn bf" onclick="closeModal('sale')">Annuler</button><button class="btn bt" id="sf-sv" onclick="saveSale()">Enregistrer</button></div>
 </div></div></div>
 
 <!-- Expense Modal -->
@@ -196,7 +196,7 @@ const pb=p=>p==='Carte'?'bcard':p==='Espèces'?'bcash':p==='Mobile Money'?'bmm':
 const pf=f=>f==='Livraison'?'bdel':'bpic';
 const ecc=c=>c==='Loyer'?'background:var(--obg);color:var(--o)':c==='Salaires'?'background:var(--ibg);color:var(--i)':'background:#f5f0eb;color:#78716c';
 
-let P=[],S=[],E=[],U=[],editPid=null,editEid=null,restockP=null,search='',fCat='Tous',online=false;
+let P=[],S=[],E=[],U=[],editPid=null,editEid=null,editSid=null,restockP=null,search='',fCat='Tous',online=false;
 let authToken=localStorage.getItem('olam_token'),userRole=localStorage.getItem('olam_role'),userName=localStorage.getItem('olam_user');
 const isAdmin=()=>userRole==='admin';
 
@@ -293,6 +293,7 @@ async function init(){
   SIZES.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;document.getElementById('pf-z').appendChild(o);});
   ECATS.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;document.getElementById('ef-c').appendChild(o);});
   document.getElementById('ef-dt').value=td();
+  document.getElementById('sf-dt').value=td();
   await syncAll();
   startAutoRefresh();
   applyRole();
@@ -312,7 +313,7 @@ async function init(){
 
 function sw(n,b){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));b.classList.add('active');['dash','inv','sales','exp','users'].forEach(t=>document.getElementById('t-'+t).style.display=t===n?'':'none');render();}
 function openModal(t){document.getElementById('m-'+t).classList.add('open');}
-function closeModal(t){document.getElementById('m-'+t).classList.remove('open');editPid=null;editEid=null;restockP=null;}
+function closeModal(t){document.getElementById('m-'+t).classList.remove('open');editPid=null;editEid=null;editSid=null;restockP=null;}
 
 function render(){rDash();rInv();rSales();rExp();if(isAdmin())rUsers();}
 
@@ -429,11 +430,12 @@ function rInv(){
 
 function rSales(){
   const tr=S.reduce((a,s)=>a+(s.total||0),0),av=S.length?Math.round(tr/S.length):0;
-  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px"><h2 style="font-family:var(--fd);font-size:20px;font-weight:700">Ventes</h2><button class="btn bp" onclick="openModal('sale')">＋ Nouvelle vente</button></div>`;
+  const adm=isAdmin();
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px"><h2 style="font-family:var(--fd);font-size:20px;font-weight:700">Ventes</h2><button class="btn bp" onclick="openSaleAdd()">＋ Nouvelle vente</button></div>`;
   h+=`<div class="sts">${mkSC('🛒','var(--obg)','var(--o)','Total',S.length,'')}${mkSC('💰','var(--tbg)','var(--t)','Revenus',fn(tr)+' F','')}${mkSC('📊','var(--ibg)','var(--i)','Moyenne',fn(av)+' F','')}</div>`;
-  h+=`<div class="tc"><div class="tsc"><table><thead><tr><th>Produit</th><th>Qté</th><th>Prix unit.</th><th>Remise</th><th>Total</th><th>Date</th><th>Paiement</th><th>Type</th></tr></thead><tbody>`;
-  if(!S.length)h+=`<tr><td colspan="8" class="emp">Aucune vente</td></tr>`;
-  else S.forEach(s=>{h+=`<tr><td class="bold">${s.productName}</td><td>${s.quantity}</td><td>${fn(s.unitPrice)} F</td><td>${s.discount?'<span class="red">-'+fn(s.discount)+' F</span>':'—'}</td><td class="bold grn">${fn(s.total)} F</td><td style="color:var(--m)">${fd(s.date)}</td><td><span class="badge ${pb(s.payment)}">${s.payment}</span></td><td><span class="badge ${pf(s.fulfillment)}">${s.fulfillment==='Livraison'?'🚚 Livraison':'🏪 Retrait'}</span></td></tr>`;});
+  h+=`<div class="tc"><div class="tsc"><table><thead><tr><th>Produit</th><th>Qté</th><th>Prix unit.</th><th>Remise</th><th>Total</th><th>Date</th><th>Paiement</th><th>Type</th>${adm?'<th>Actions</th>':''}</tr></thead><tbody>`;
+  if(!S.length)h+=`<tr><td colspan="${adm?9:8}" class="emp">Aucune vente</td></tr>`;
+  else S.forEach(s=>{h+=`<tr><td class="bold">${s.productName}</td><td>${s.quantity}</td><td>${fn(s.unitPrice)} F</td><td>${s.discount?'<span class="red">-'+fn(s.discount)+' F</span>':'—'}</td><td class="bold grn">${fn(s.total)} F</td><td style="color:var(--m)">${fd(s.date)}</td><td><span class="badge ${pb(s.payment)}">${s.payment}</span></td><td><span class="badge ${pf(s.fulfillment)}">${s.fulfillment==='Livraison'?'🚚 Livraison':'🏪 Retrait'}</span></td>${adm?`<td><div style="display:flex;gap:5px"><button class="btn bf bs" onclick="editSale('${s.id}')">✏️</button><button class="btn bf bs" style="color:var(--r)" onclick="delSale('${s.id}')">🗑</button></div></td>`:''}</tr>`;});
   h+=`</tbody></table></div></div>`;
   document.getElementById('t-sales').innerHTML=h;
 }
@@ -514,22 +516,72 @@ async function doRestock(){
   closeModal('restock');render();
 }
 
+// ── Low Stock Toast ──
+function showLowStockWarning(w){
+  if(!w)return;
+  const d=document.createElement('div');
+  d.style.cssText='position:fixed;top:20px;right:20px;z-index:2000;background:#fff1f2;border:2px solid #fecdd3;border-radius:14px;padding:16px 22px;box-shadow:0 8px 24px rgba(225,29,72,.15);font-family:var(--fb);animation:su .3s ease-out;max-width:360px';
+  d.innerHTML=`<div style="font-weight:700;color:#e11d48;font-size:14px;margin-bottom:4px">⚠️ Stock bas</div><div style="font-size:13px;color:#292524"><strong>${w.productName}</strong> — ${w.newStock} restant(s)</div>`;
+  document.body.appendChild(d);
+  setTimeout(()=>{d.style.opacity='0';d.style.transition='opacity .3s';setTimeout(()=>d.remove(),300);},4000);
+}
+
 // ── Sale ──
 function onSPC(){const p=P.find(x=>x.id===document.getElementById('sf-p').value);document.getElementById('sf-pr').value=p&&p.price>0?p.price:'';uST();}
 function uST(){const pr=parseFloat(document.getElementById('sf-pr').value)||0,q=parseInt(document.getElementById('sf-q').value)||0,disc=parseFloat(document.getElementById('sf-disc').value)||0;if(pr>0&&q>0){const sub=pr*q,tot=Math.max(0,sub-disc);document.getElementById('sf-t').textContent=fn(tot)+' FCFA'+(disc>0?' (remise '+fn(disc)+')':'');document.getElementById('sf-tr').style.display='';}else document.getElementById('sf-tr').style.display='none';}
 
-async function recSale(){
+function resetSaleForm(){document.getElementById('sf-p').value='';document.getElementById('sf-pr').value='';document.getElementById('sf-q').value='1';document.getElementById('sf-disc').value='';document.getElementById('sf-pay').value='Espèces';document.getElementById('sf-ful').value='Retrait';document.getElementById('sf-dt').value=td();document.getElementById('sf-tr').style.display='none';}
+
+function openSaleAdd(){editSid=null;document.getElementById('ms-t').textContent='Enregistrer une vente';document.getElementById('sf-sv').textContent='Enregistrer';resetSaleForm();openModal('sale');}
+
+function editSale(id){
+  const s=S.find(x=>x.id===id);if(!s)return;editSid=id;
+  document.getElementById('ms-t').textContent='Modifier la vente';
+  document.getElementById('sf-sv').textContent='Enregistrer';
+  refreshSD();
+  const mp=P.find(x=>x.name===s.productName);
+  if(mp)document.getElementById('sf-p').value=mp.id;
+  document.getElementById('sf-pr').value=s.unitPrice||'';
+  document.getElementById('sf-q').value=s.quantity||1;
+  document.getElementById('sf-disc').value=s.discount||'';
+  document.getElementById('sf-pay').value=s.payment||'Espèces';
+  document.getElementById('sf-ful').value=s.fulfillment||'Retrait';
+  document.getElementById('sf-dt').value=s.date||td();
+  uST();
+  openModal('sale');
+}
+
+async function saveSale(){
   const pid=document.getElementById('sf-p').value,p=P.find(x=>x.id===pid);
   if(!p)return alert('Sélectionnez un produit');
   const pr=parseFloat(document.getElementById('sf-pr').value)||0,q=parseInt(document.getElementById('sf-q').value)||0,disc=parseFloat(document.getElementById('sf-disc').value)||0;
   if(pr<=0||q<=0)return alert('Prix et quantité requis');
   const tot=Math.max(0,pr*q-disc);
-  const id=gid(),s={id,productName:p.name,quantity:q,unitPrice:pr,total:tot,discount:disc,date:td(),payment:document.getElementById('sf-pay').value,fulfillment:document.getElementById('sf-ful').value,productId:pid};
+  const dt=document.getElementById('sf-dt').value||td();
+  const data={productName:p.name,quantity:q,unitPrice:pr,total:tot,discount:disc,date:dt,payment:document.getElementById('sf-pay').value,fulfillment:document.getElementById('sf-ful').value,productId:pid};
   try{
-    await apiPost('/api/sales',s);
+    let res;
+    if(editSid){
+      res=await apiPut('/api/sales/'+editSid,data);
+    } else {
+      const id=gid();
+      res=await apiPost('/api/sales',{id,...data});
+    }
+    if(res&&res.lowStockWarning)showLowStockWarning(res.lowStockWarning);
     await syncAll();
   }catch(e){console.error(e);}
-  closeModal('sale');document.getElementById('sf-p').value='';document.getElementById('sf-pr').value='';document.getElementById('sf-q').value='1';document.getElementById('sf-disc').value='';document.getElementById('sf-ful').value='Retrait';document.getElementById('sf-tr').style.display='none';render();
+  closeModal('sale');resetSaleForm();render();
+}
+
+async function delSale(id){
+  if(!confirm('Supprimer cette vente ? Le stock sera restauré.'))return;
+  try{
+    const res=await fetch(API_URL+'/api/sales/'+id,{method:'DELETE',headers:{'Content-Type':'application/json',...authHeaders()}});
+    if(res.status===401){doLogout();return;}
+    if(res.ok){const d=await res.json();if(d&&d.lowStockWarning)showLowStockWarning(d.lowStockWarning);}
+    await syncAll();
+  }catch(e){console.error(e);}
+  render();
 }
 
 // ── Expense ──
@@ -630,7 +682,7 @@ function refreshSD(){
   const sel=document.getElementById('sf-p'),cur=sel.value;
   sel.innerHTML='<option value="">Sélectionner...</option>'+P.map(p=>`<option value="${p.id}"${p.id===cur?' selected':''}>${p.sku?p.sku+' — ':''}${p.name}${p.stock>0?' ('+p.stock+')':''}</option>`).join('');
 }
-const _om=openModal;openModal=function(t){if(t==='sale')refreshSD();_om(t);};
+const _om=openModal;openModal=function(t){if(t==='sale'){refreshSD();if(!editSid){document.getElementById('ms-t').textContent='Enregistrer une vente';document.getElementById('sf-sv').textContent='Enregistrer';}}_om(t);};
 </script>
 </body>
 </html>

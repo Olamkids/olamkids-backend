@@ -140,10 +140,13 @@ app.post('/api/products/:id/deduct', (req, res) => {
   if (!product) return res.status(404).json({ error: 'Product not found' });
 
   const { qty } = req.body;
-  const newStock = Math.max(0, (product.stock || 0) - (qty || 1));
+  const oldStock = product.stock || 0;
+  const newStock = Math.max(0, oldStock - (qty || 1));
 
   db.prepare(`UPDATE products SET stock = ?, updated_at = datetime('now') WHERE id = ?`).run(newStock, req.params.id);
-  res.json(db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id));
+  const updated = db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
+  const lowStockWarning = checkLowStock(product.name, oldStock, newStock);
+  res.json(lowStockWarning ? { ...updated, lowStockWarning } : updated);
 });
 
 app.delete('/api/products/:id', adminOnly, (req, res) => {
@@ -175,25 +178,89 @@ app.post('/api/sales', (req, res) => {
   `).run(sid, productName, quantity || 1, unitPrice || 0, total || 0, discount || 0, date, payment || 'Espèces', fulfillment || 'Retrait');
 
   // Deduct stock if productId provided
+  let lowStockWarning = null;
   if (productId) {
     const product = db.prepare('SELECT * FROM products WHERE id = ?').get(productId);
     if (product && product.stock > 0) {
-      const newStock = Math.max(0, product.stock - (quantity || 1));
+      const oldStock = product.stock;
+      const newStock = Math.max(0, oldStock - (quantity || 1));
       db.prepare('UPDATE products SET stock = ?, updated_at = datetime(\'now\') WHERE id = ?').run(newStock, productId);
+      lowStockWarning = checkLowStock(product.name, oldStock, newStock);
     }
   }
 
   const sale = db.prepare('SELECT * FROM sales WHERE id = ?').get(sid);
-  res.status(201).json(sale);
+  const result = lowStockWarning ? { ...sale, lowStockWarning } : sale;
+  res.status(201).json(result);
+});
+
+// Helper: check if stock crossed below 5 (from >=5 to <5)
+function checkLowStock(productName, oldStock, newStock) {
+  if (oldStock >= 5 && newStock < 5) {
+    return { productName, newStock };
+  }
+  return null;
+}
+
+app.put('/api/sales/:id', adminOnly, (req, res) => {
+  const db = getDb();
+  const existing = db.prepare('SELECT * FROM sales WHERE id = ?').get(req.params.id);
+  if (!existing) return res.status(404).json({ error: 'Sale not found' });
+
+  const { productName, quantity, unitPrice, total, discount, date, payment, fulfillment } = req.body;
+  const newQty = quantity !== undefined ? quantity : existing.quantity;
+  const oldQty = existing.quantity || 0;
+
+  let lowStockWarning = null;
+
+  // Stock adjustment if quantity changed
+  if (newQty !== oldQty) {
+    const pName = productName || existing.productName;
+    const product = db.prepare('SELECT * FROM products WHERE name = ?').get(pName);
+    if (product) {
+      const delta = oldQty - newQty;
+      const oldStock = product.stock || 0;
+      const newStock = Math.max(0, oldStock + delta);
+      db.prepare("UPDATE products SET stock = ?, updated_at = datetime('now') WHERE id = ?").run(newStock, product.id);
+      lowStockWarning = checkLowStock(product.name, oldStock, newStock);
+    }
+  }
+
+  db.prepare(`UPDATE sales SET productName = ?, quantity = ?, unitPrice = ?, total = ?, discount = ?, date = ?, payment = ?, fulfillment = ? WHERE id = ?`)
+    .run(
+      productName || existing.productName,
+      newQty,
+      unitPrice !== undefined ? unitPrice : existing.unitPrice,
+      total !== undefined ? total : existing.total,
+      discount !== undefined ? discount : existing.discount,
+      date || existing.date,
+      payment || existing.payment,
+      fulfillment || existing.fulfillment || 'Retrait',
+      req.params.id
+    );
+
+  const updated = db.prepare('SELECT * FROM sales WHERE id = ?').get(req.params.id);
+  const result = lowStockWarning ? { ...updated, lowStockWarning } : updated;
+  res.json(result);
 });
 
 app.delete('/api/sales/:id', adminOnly, (req, res) => {
   const db = getDb();
-  const existing = db.prepare('SELECT id FROM sales WHERE id = ?').get(req.params.id);
+  const existing = db.prepare('SELECT * FROM sales WHERE id = ?').get(req.params.id);
   if (!existing) return res.status(404).json({ error: 'Sale not found' });
 
+  // Restore stock
+  let lowStockWarning = null;
+  const product = db.prepare('SELECT * FROM products WHERE name = ?').get(existing.productName);
+  if (product) {
+    const oldStock = product.stock || 0;
+    const newStock = oldStock + (existing.quantity || 0);
+    db.prepare("UPDATE products SET stock = ?, updated_at = datetime('now') WHERE id = ?").run(newStock, product.id);
+    lowStockWarning = checkLowStock(product.name, oldStock, newStock);
+  }
+
   db.prepare('DELETE FROM sales WHERE id = ?').run(req.params.id);
-  res.status(204).send();
+  res.json({ deleted: true, lowStockWarning });
 });
 
 // ============================================================
